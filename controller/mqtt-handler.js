@@ -42,12 +42,12 @@ sendMessage(message) {
     this.mqttClient.publish('mytopic', message);
   }
 
-confirmAvailablility() {
-this.mqttClient.publish('response/available/good', true)
+confirmAvailablility(message) {
+this.mqttClient.publish('response/available/good', message)
   }
 
-denyAvailablility() {
-  this.mqttClient.publish('response/available/bad', false)
+denyAvailablility(message) {
+  this.mqttClient.publish('response/available/bad', message)
   }
 }
 

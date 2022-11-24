@@ -103,8 +103,8 @@ router.put('/:id', function (req, res, next) {
         var date = req.body.date
         var issuance = req.body.issuance
         var clinicId = req.body.clinicId
-        if (!(/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/.test(date))) {
-            return res.json({ "message": "Date must be in DD-MM-YYYY format" });
+        if (!(/[12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])/.test(date))) {
+            return res.json({ "message": "Date must be in YYYY-MM-DD format" });
         } else if (date === null) {
             return res.json({ "message": "Date is required" });
         } else {
@@ -114,6 +114,8 @@ router.put('/:id', function (req, res, next) {
             bookingRequest.issuance = issuance
             bookingRequest.date = date
             bookingRequest.state = state
+            bookingRequest.start = start
+            bookingRequest.end = end
             bookingRequest.save();
             res.status(200).json(bookingRequest);
         }
@@ -134,6 +136,8 @@ router.patch('/:id', function (req, res, next) {
         bookingRequest.issuance = (req.body.issuance || bookingRequest.issuance)
         bookingRequest.date = (req.body.date || bookingRequest.date)
         bookingRequest.state = (req.body.state || bookingRequest.state)
+        bookingRequest.start = (req.body.start || bookingRequest.start)
+        bookingRequest.end = (req.body.end || bookingRequest.end)
         bookingRequest.save();
         res.status(200).json(bookingRequest);
     });
