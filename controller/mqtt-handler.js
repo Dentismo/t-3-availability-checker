@@ -1,4 +1,5 @@
 const mqtt = require('mqtt');
+const checkAvailability = require('../controller');
 
 class MqttHandler {
 constructor() {
@@ -26,8 +27,11 @@ connect() {
     // mqtt subscriptions
     this.mqttClient.subscribe('mytopic', {qos: 0});
 
+    this.mqttClient.subscribe('request/available', {qos: 0});
+
     // When a message arrives, console.log it
     this.mqttClient.on('message', function (topic, message) {
+    checkAvailability(message.toJSON)
     console.log(message.toString());
     });
 
@@ -36,6 +40,14 @@ connect() {
   // Sends a mqtt message to topic: mytopic
 sendMessage(message) {
     this.mqttClient.publish('mytopic', message);
+  }
+
+confirmAvailablility() {
+this.mqttClient.publish('response/available/good', true)
+  }
+
+denyAvailablility() {
+  this.mqttClient.publish('response/available/bad', false)
   }
 }
 

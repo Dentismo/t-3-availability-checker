@@ -28,7 +28,7 @@ var bookingRequestSchema = new Schema({
         match: [/^[0-9]*$/, 'Field may only contain numbers.']
     },
     date: {
-        type: Date,
+        type: String,
         required: true
     },
     state: {

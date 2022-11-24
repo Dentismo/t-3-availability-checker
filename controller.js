@@ -1,7 +1,64 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var BookingRequest = require('../models/bookingRequest.js');
+const MqttHandler = require('./controller/mqtt-handler.js');
+var Clinic = require('')
 
+const mqtt = new MqttHandler()
+
+function checkAvailability(bookingRequest) {
+    const clinic = Clinic.findById(bookingRequest.clinicId)
+
+    var dateExample = "1 23/11/2022 9:30-10:00"
+    const array = dateExample.split(" ")
+    const timeArray = array[2].split("-")
+    var day = array[0]
+    const desiredDate = array[1]
+    var startTime = timeArray[0]
+    var endTime = timeArray[1]
+
+
+    switch(day){
+        case 1:
+            //for the given day - check clinic opneing time
+            checkBookingRequests(clinic, bookingRequest)
+            break;
+        case 2:
+            //for the given day - check clinic opneing time
+            checkBookingRequests(clinic, bookingRequest)
+            break;
+        case 3:
+            //for the given day - check clinic opneing time
+            checkBookingRequests(clinic, bookingRequest)
+            break;
+        case 4:
+            //for the given day - check clinic opneing time
+            checkBookingRequests(clinic, bookingRequest)
+            break;
+        case 5:
+            //for the given day - check clinic opneing time
+            checkBookingRequests(clinic, bookingRequest)
+            break;
+        default:
+            mqtt.denyAvailablility()
+            break;
+    }
+    
+
+
+    //find clinic client is attempting to book through
+    //compare desired time to opening hours for desired day
+    //if desired time is outside of opening hours, return message
+    //if desired time is within opening hours, get approved booking requests with that timeslot
+    //if response is empty, mqtt.confirmAvailability
+    //if response is not empty, mqtt.denyAvailability
+
+}
+
+async function checkBookingRequests(clinic, bookingRequest) {
+    const bookingRequests = await BookingRequest.find({clinicId: clinic._id})
+
+}
 
 //Get BookingRequest by id
 router.get('/:id', function(req, res, next) {
@@ -95,4 +152,4 @@ router.delete("/:id", async(req, res) => {
     });
 });
 
-module.exports = router;
+module.exports = checkAvailability;
