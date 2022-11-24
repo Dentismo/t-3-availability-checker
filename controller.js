@@ -19,12 +19,12 @@ class AvailabilityController {
         var day = date.getDay()
     
         if(day == 0 || day == 6 ){
-            return '{message: "Day is outside of clinic opening hours, please try another date."}';
+            return '{message: Failure - "Day is outside of clinic opening hours, please try another date."}';
         } else {
         if(checkDailyHours(clinic, bookingRequest, day)){
             checkBookingRequests(clinic, bookingRequest)
             } else {
-                return '{message: "Requested time-slot is outside of clinic opening hours. Please select another time."}';
+                return '{message: Failure - "Requested time-slot is outside of clinic opening hours. Please select another time."}';
             }
         }
     }
@@ -34,11 +34,11 @@ class AvailabilityController {
         for (let i = 0; i < bookingRequests.length; i++) {
             if (bookingRequests.state == "approved" || bookingRequests.state == "pending") {
                 if (bookingRequests.date == bookingRequest.date && bookingRequest.start == bookingRequests.start) {
-                    return '{message: "Time-slot is already booked. Please try a different time-slot!"}';
+                    return '{message: Failure - "Time-slot is already booked. Please try a different time-slot!"}';
                 }
             }
         }
-        return '{message: "Time-slot is available"}';
+        return '{message: Success - "Time-slot is available"}';
     }
     
     checkDailyHours(clinic, bookingRequest, day) {

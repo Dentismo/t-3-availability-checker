@@ -17,30 +17,39 @@ class MqttHandler {
 
     // Mqtt error calback
     this.mqttClient.on('error', (err) => {
-    console.log(err);
-    this.mqttClient.end();
+      console.log(err);
+      this.mqttClient.end();
     });
 
     // Connection callback
     this.mqttClient.on('connect', () => {
-    console.log(`mqtt client connected`);
+      console.log(`mqtt client connected`);
     });
 
     const client = this.mqttClient;
 
     // mqtt subscriptions
-    this.mqttClient.subscribe('mytopic', {qos: 0});
+    this.mqttClient.subscribe('mytopic', { qos: 0 });
 
-    this.mqttClient.subscribe('request/availablity', {qos: 1});
+    this.mqttClient.subscribe('request/availablity', { qos: 1 });
 
     // When a message arrives, console.log it
     this.mqttClient.on('message', function (topic, message) {
       // checkAvailability(message.toJSON)
       // console.log(message.toString());
       const response = availabilityController.checkAvailability(message.toJSON());
+      const array = response.split(" ")
+      switch (array[1]) {
+        case "Failure":
+          this.mqttClient.publish('response/availablity/bad')
+          break;
+        case "Success":
+        this.mqttClient.publish('response/availablity/good')
+          break;
+      }
     });
   }
-}  
+}
 
 
 
