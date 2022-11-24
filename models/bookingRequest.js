@@ -1,4 +1,7 @@
-var bookingRequestSchema = new Schema({
+const mongoose = require("mongoose")
+
+
+var bookingRequestSchema = new mongoose.Schema({
     user: {
         email: {
             type: String,
@@ -25,7 +28,7 @@ var bookingRequestSchema = new Schema({
         match: [/^[0-9]*$/, 'Field may only contain numbers.']
     },
     date: {
-        type: Date,
+        type: String,
         required: true
     },
     state: {

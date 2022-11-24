@@ -1,15 +1,17 @@
 const mqtt = require('mqtt');
-const checkAvailability = require('../controller');
+const AvailabilityController = require('../controller');
+
+const availabilityController = new AvailabilityController();
 
 class MqttHandler {
-constructor() {
+  constructor() {
     this.mqttClient = null;
     this.host = 'http://localhost:1883';
     this.username = 'YOUR_USER'; // mqtt credentials if these are needed to connect
     this.password = 'YOUR_PASSWORD';
-}
+  }
 
-connect() {
+  connect() {
     // Connect mqtt with credentials (in case of needed, otherwise we can omit 2nd param)
     this.mqttClient = mqtt.connect(this.host, { username: this.username, password: this.password });
 
@@ -24,32 +26,36 @@ connect() {
     console.log(`mqtt client connected`);
     });
 
+    const client = this.mqttClient;
+
     // mqtt subscriptions
     this.mqttClient.subscribe('mytopic', {qos: 0});
 
-    this.mqttClient.subscribe('request/available', {qos: 0});
+    this.mqttClient.subscribe('request/availablity', {qos: 1});
 
     // When a message arrives, console.log it
     this.mqttClient.on('message', function (topic, message) {
-    checkAvailability(message.toJSON)
-    console.log(message.toString());
+      // checkAvailability(message.toJSON)
+      // console.log(message.toString());
+      const response = availabilityController.checkAvailability(message.toJSON());
     });
-
   }
+}  
 
-  // Sends a mqtt message to topic: mytopic
-sendMessage(message) {
-    this.mqttClient.publish('mytopic', message);
-  }
 
-confirmAvailablility(message) {
-this.mqttClient.publish('response/available/good', message)
-  }
 
-denyAvailablility(message) {
-  this.mqttClient.publish('response/available/bad', message)
-  }
-}
+// Sends a mqtt message to topic: mytopic
+// sendMessage(message) {
+//     this.mqttClient.publish('mytopic', message);
+//   }
+
+// confirmAvailablility(message) {
+// this.mqttClient.publish('response/available/good', message)
+//   }
+
+// denyAvailablility(message) {
+//   this.mqttClient.publish('response/available/bad', message)
+//   }
 
 
 module.exports = MqttHandler;

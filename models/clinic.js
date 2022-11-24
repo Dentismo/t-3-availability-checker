@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const {dentistSchema} = require('./dentist');
 
 
 const clinicSchema = new mongoose.Schema({
