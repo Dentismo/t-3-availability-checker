@@ -2,68 +2,88 @@ var express = require('express');
 var router = express.Router({ mergeParams: true });
 var BookingRequest = require('../models/bookingRequest.js');
 const MqttHandler = require('./controller/mqtt-handler.js');
-var Clinic = require('')
+var Clinic = require('./models/clinic.js')
 
 const mqtt = new MqttHandler()
 
 function checkAvailability(bookingRequest) {
     const clinic = Clinic.findById(bookingRequest.clinicId)
 
-    var dateExample = "1 23/11/2022 9:30-10:00"
-    const array = dateExample.split(" ")
-    const timeArray = array[2].split("-")
-    var day = array[0]
-    const desiredDate = array[1]
-    var startTime = timeArray[0]
-    var endTime = timeArray[1]
+   //date example "2022/11/23 9:30-10:00"
+    const bookingDate = bookingRequest.date
+    var date = new Date(bookingDate)
+    var day = date.getDay()
 
-
-    switch(day){
-        case 1:
-            //for the given day - check clinic opneing time
-            checkBookingRequests(clinic, bookingRequest)
-            break;
-        case 2:
-            //for the given day - check clinic opneing time
-            checkBookingRequests(clinic, bookingRequest)
-            break;
-        case 3:
-            //for the given day - check clinic opneing time
-            checkBookingRequests(clinic, bookingRequest)
-            break;
-        case 4:
-            //for the given day - check clinic opneing time
-            checkBookingRequests(clinic, bookingRequest)
-            break;
-        case 5:
-            //for the given day - check clinic opneing time
-            checkBookingRequests(clinic, bookingRequest)
-            break;
-        default:
-            mqtt.denyAvailablility()
-            break;
+    if(day == 0 || day == 6 ){
+        mqtt.denyAvailablility("Day is outside of clinic opening hours, please try another date.")
+    } else {
+    if(checkDailyHours(clinic, bookingRequest, day)){
+        checkBookingRequests(clinic, bookingRequest)
+        } else {
+            mqtt.denyAvailablility("Requested time-slot is outside of clinic opening hours. Please select another time.")
+        }
     }
-    
-
-
     //find clinic client is attempting to book through
+    //Check if desired day is a weekday
     //compare desired time to opening hours for desired day
     //if desired time is outside of opening hours, return message
-    //if desired time is within opening hours, get approved booking requests with that timeslot
+    //if desired time is within opening hours, get approved and pending booking requests with that timeslot
     //if response is empty, mqtt.confirmAvailability
     //if response is not empty, mqtt.denyAvailability
 
 }
 
 async function checkBookingRequests(clinic, bookingRequest) {
-    const bookingRequests = await BookingRequest.find({clinicId: clinic._id})
+    const bookingRequests = await BookingRequest.find({ clinicId: clinic._id })
+    for (let i = 0; i < bookingRequests.length; i++) {
+        if (bookingRequests.state == "approved" || bookingRequests.state == "pending") {
+            if (bookingRequests.date == bookingRequest.date && bookingRequest.start == bookingRequests.start) {
+                mqtt.denyAvailablility("Time-slot is already booked. Please try a different time-slot")
+            }
+        }
+    }
+    mqtt.confirmAvailablility("Time-slot is available")
+}
 
+async function checkDailyHours(clinic, bookingRequest, day) {
+    switch (day) {
+        case 1:
+            if (bookingRequest.start >= clinic.openingHours.monday.start && bookingRequest.end <= clinic.openingHours.monday.finish) {
+                return true;
+            } else {
+                return false;
+            }
+        case 2:
+            if (bookingRequest.start >= clinic.openingHours.tuesday.start && bookingRequest.end <= clinic.openingHours.tuesday.finish) {
+                return true;
+            } else {
+                return false;
+            }
+        case 3:
+            if (bookingRequest.start >= clinic.openingHours.wednesday.start && bookingRequest.end <= clinic.openingHours.wednesday.finish) {
+                return true;
+            } else {
+                return false;
+            }
+        case 4:
+            if (bookingRequest.start >= clinic.openingHours.thursday.start && bookingRequest.end <= clinic.openingHours.thursday.finish) {
+                return true;
+            } else {
+                return false;
+            }
+        case 5:
+            if (bookingRequest.start >= clinic.openingHours.friday.start && bookingRequest.end <= clinic.openingHours.friday.finish) {
+                return true;
+            } else {
+                return false;
+            }
+    }
 }
 
 //Get BookingRequest by id
-router.get('/:id', function(req, res, next) {
+router.get('/:id', function (req, res, next) {
     var id = req.params.id
-    BookingRequest.findById(id, function(err, bookingRequest) {
+    BookingRequest.findById(id, function (err, bookingRequest) {
         if (err) { return next(err); }
         if (!bookingRequest) {
             return res.status(404).json({ 'message': 'Booking request was not found!' });
@@ -73,9 +93,9 @@ router.get('/:id', function(req, res, next) {
 });
 
 //Update entire booking request
-router.put('/:id', function(req, res, next) {
+router.put('/:id', function (req, res, next) {
     var id = req.params.id;
-    BookingRequest.findById(id, function(err, bookingRequest) {
+    BookingRequest.findById(id, function (err, bookingRequest) {
         if (err) { return next(err); }
         if (!bookingRequest) {
             return res.status(404).json({ "message": "Booking request not found" });
@@ -83,27 +103,27 @@ router.put('/:id', function(req, res, next) {
         var date = req.body.date
         var issuance = req.body.issuance
         var clinicId = req.body.clinicId
-        if (!(/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/.test(date))){
-            return res.json({"message": "Date must be in DD-MM-YYYY format"});
+        if (!(/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/.test(date))) {
+            return res.json({ "message": "Date must be in DD-MM-YYYY format" });
         } else if (date === null) {
             return res.json({ "message": "Date is required" });
         } else {
-        bookingRequest.user.email = rep.body.user.email
-        bookingRequest.user.name = rep.body.user.name
-        bookingRequest.clinicId = clinicId
-        bookingRequest.issuance = issuance
-        bookingRequest.date = date
-        bookingRequest.state = state
-        bookingRequest.save();
-        res.status(200).json(bookingRequest);
+            bookingRequest.user.email = rep.body.user.email
+            bookingRequest.user.name = rep.body.user.name
+            bookingRequest.clinicId = clinicId
+            bookingRequest.issuance = issuance
+            bookingRequest.date = date
+            bookingRequest.state = state
+            bookingRequest.save();
+            res.status(200).json(bookingRequest);
         }
     });
 });
 
 //Update all/part of a booking request
-router.patch('/:id', function(req, res, next) {
+router.patch('/:id', function (req, res, next) {
     var id = req.params.id;
-    BookingRequest.findById(id, function(err, bookingRequest) {
+    BookingRequest.findById(id, function (err, bookingRequest) {
         if (err) { return next(err); }
         if (!bookingRequest) {
             return res.status(404).json({ "message": "Booking request was not found" });
@@ -120,17 +140,17 @@ router.patch('/:id', function(req, res, next) {
 });
 
 //Create a booking request
-router.post('/', function(req, res, next){
+router.post('/', function (req, res, next) {
     var bookingRequest = new BookingRequest(req.body);
-    bookingRequest.save(function(err) {
+    bookingRequest.save(function (err) {
         if (err) { return next(err); }
         res.status(201).json(bookingRequest);
     })
 });
 
 // Get all appointements
-router.get("/", async(req, res) => {
-    BookingRequest.find().exec(function(err, results) {
+router.get("/", async (req, res) => {
+    BookingRequest.find().exec(function (err, results) {
         if (err) { return next(err); }
         if (!results) { return res.status(404).json({ 'message': 'No booking requests found!' }); }
         res.status(200).json(results);
@@ -138,17 +158,17 @@ router.get("/", async(req, res) => {
 });
 
 // Delete a specific booking
-router.delete("/:id", async(req, res) => {
+router.delete("/:id", async (req, res) => {
     const id = req.params.id;
 
-    BookingRequest.findOneAndDelete({ _id: id }, function(err, bookingRequest) {
+    BookingRequest.findOneAndDelete({ _id: id }, function (err, bookingRequest) {
         if (err) {
             return next(err);
         }
         if (bookingRequest === null) {
             return res.status(404).json({ "message": "Booking request doesn't exist" });
         }
-        res.status().json({'message': 'Booking request deleted successfully!'})
+        res.status().json({ 'message': 'Booking request deleted successfully!' })
     });
 });
 
