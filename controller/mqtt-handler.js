@@ -1,7 +1,7 @@
 const mqtt = require('mqtt');
-const AvailabilityController = require('../controller');
+const checkAvailability = require('../controller');
 
-const availabilityController = new AvailabilityController();
+//const availabilityController = new AvailabilityController();
 
 class MqttHandler {
   constructor() {
@@ -35,18 +35,26 @@ class MqttHandler {
 
     // When a message arrives, console.log it
     this.mqttClient.on('message', function (topic, message) {
-      // checkAvailability(message.toJSON)
-      // console.log(message.toString());
-      const response = availabilityController.checkAvailability(message.toJSON());
-      const array = response.split(" ")
-      switch (array[1]) {
-        case "Failure":
-          this.mqttClient.publish('response/availablity/bad')
-          break;
-        case "Success":
-        this.mqttClient.publish('response/availablity/good')
-          break;
+      const response = checkAvailability(message.toJSON());
+      console.log('BRFORE CHECKING')
+      if (response === '{message: Success - "Time-slot is available"}') {
+        client.publish('response/availablity/good', response.toString())
+        console.log('SUCCESS')
+      } else {
+        client.publish('response/availablity/bad', response.toString())
+        console.log('FAILURE')
+        console.log(response.toString())
       }
+      // const array = response.toString().split(" ")
+      // console.log(response.toString())
+      // switch (array[1]) {
+      //   case "Failure":
+      //     this.mqttClient.publish('response/availablity/bad', response)
+      //     break;
+      //   case "Success":
+      //   this.mqttClient.publish('response/availablity/good', response)
+      //     break;
+      // }
     });
   }
 }
