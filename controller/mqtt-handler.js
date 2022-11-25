@@ -34,16 +34,16 @@ class MqttHandler {
     this.mqttClient.subscribe('request/availablity', { qos: 1 });
 
     // When a message arrives, console.log it
-    this.mqttClient.on('message', function (topic, message) {
-      const response = checkAvailability(message.toJSON());
+    this.mqttClient.on('message', async function (topic, message) {
+      const response = await checkAvailability(message.toJSON());
       console.log('BRFORE CHECKING')
       if (response === '{message: Success - "Time-slot is available"}') {
-        client.publish('response/availablity/good', response.toString())
+        client.publish('response/availablity/good', response)
         console.log('SUCCESS')
       } else {
-        client.publish('response/availablity/bad', response.toString())
+        client.publish('response/availablity/bad', response)
         console.log('FAILURE')
-        console.log(response.toString())
+        //console.log(response.toString())
       }
       // const array = response.toString().split(" ")
       // console.log(response.toString())

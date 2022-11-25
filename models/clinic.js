@@ -5,14 +5,6 @@ const clinicSchema = new mongoose.Schema({
     dentists: {
         type: Number
     },
-    issuance: {
-        type: String, 
-        unique: true
-    },
-    date: {
-        type: Date,
-        default: Date.now()
-    },
     address: {
         type: String,
         required: true
@@ -34,51 +26,51 @@ const clinicSchema = new mongoose.Schema({
     openinghours: {
         monday: {
             start: {
-                type: Number,
+                type: String,
                 required: true
             },
             finish: {
-                type: Number,
+                type: String,
                 required: true
             }
         },
         tuesday: {
             start: {
-                type: Number,
+                type: String,
                 required: true
             },
             finish: {
-                type: Number,
+                type: String,
                 required: true
             }
         },
         wednesday: {
             start: {
-                type: Number,
+                type: String,
                 required: true
             },
             finish: {
-                type: Number,
+                type: String,
                 required: true
             }
         },
         thursday: {
             start: {
-                type: Number,
+                type: String,
                 required: true
             },
             finish: {
-                type: Number,
+                type: String,
                 required: true
             }
         },
         friday: {
             start: {
-                type: Number,
+                type: String,
                 required: true
             },
             finish: {
-                type: Number,
+                type: String,
                 required: true
             }
         }

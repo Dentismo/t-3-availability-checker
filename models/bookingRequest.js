@@ -18,7 +18,6 @@ var bookingRequestSchema = new mongoose.Schema({
         type: String,
         minLength: 1,
         required: true,
-        match: [/^[0-9]*$/, 'Field may only contain numbers.']
     },
     issuance: {
         type: String,
