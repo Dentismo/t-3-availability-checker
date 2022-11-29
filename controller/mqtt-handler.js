@@ -21,58 +21,23 @@ class MqttHandler {
       this.mqttClient.end();
     });
 
+    const client = this.mqttClient;
+
     // Connection callback
     this.mqttClient.on('connect', () => {
       console.log(`mqtt client connected`);
+      client.subscribe('request/availablity', { qos: 1 });
     });
 
-    const client = this.mqttClient;
-
-    // mqtt subscriptions
-    this.mqttClient.subscribe('mytopic', { qos: 0 });
-
-    this.mqttClient.subscribe('request/availablity', { qos: 1 });
 
     // When a message arrives, console.log it
     this.mqttClient.on('message', async function (topic, message) {
-      const response = await checkAvailability(message.toJSON());
-      console.log('BRFORE CHECKING')
-      if (response === '{message: Success - "Time-slot is available"}') {
-        client.publish('response/availablity/good', response)
-        console.log('SUCCESS')
-      } else {
-        client.publish('response/availablity/bad', response)
-        console.log('FAILURE')
-        //console.log(response.toString())
-      }
-      // const array = response.toString().split(" ")
-      // console.log(response.toString())
-      // switch (array[1]) {
-      //   case "Failure":
-      //     this.mqttClient.publish('response/availablity/bad', response)
-      //     break;
-      //   case "Success":
-      //   this.mqttClient.publish('response/availablity/good', response)
-      //     break;
-      // }
+      const result = await checkAvailability(JSON.parse(message.toString()));
+      client.publish('response/availability', JSON.stringify(result))
+      console.log(result)
     });
   }
 }
-
-
-
-// Sends a mqtt message to topic: mytopic
-// sendMessage(message) {
-//     this.mqttClient.publish('mytopic', message);
-//   }
-
-// confirmAvailablility(message) {
-// this.mqttClient.publish('response/available/good', message)
-//   }
-
-// denyAvailablility(message) {
-//   this.mqttClient.publish('response/available/bad', message)
-//   }
 
 
 module.exports = MqttHandler;
