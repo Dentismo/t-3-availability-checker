@@ -33,7 +33,11 @@ class MqttHandler {
     // When a message arrives, console.log it
     this.mqttClient.on('message', async function (topic, message) {
       const result = await checkAvailability(JSON.parse(message.toString()));
-      client.publish('response/availability', JSON.stringify(result))
+      if( result.accepted )
+        client.publish('request/createBooking', JSON.stringify(result))
+      else 
+        client.publish('response/createBooking', JSON.stringify(result))
+      
       console.log(result)
     });
   }
