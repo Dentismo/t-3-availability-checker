@@ -35,7 +35,8 @@ class MqttHandler {
     // When a message arrives, console.log it
     this.mqttClient.on('message', async function (topic, message) {
       var bookingRequest = JSON.parse(message)
-      if (validateBookingRequest(bookingRequest).length == 0) {
+      var errors = validateBookingRequest(bookingRequest)
+      if (errors.length == 0) {
         const result = await checkAvailability(JSON.parse(message.toString()));
         if (result.accepted) {
           client.publish('request/createBooking', JSON.stringify(result))
@@ -44,7 +45,7 @@ class MqttHandler {
           console.log(result)
         }
       } else {
-        client.publish('response/createBooking', 'Invalid booking request body')
+        client.publish('response/createBooking', errors.toString())
       }
     });
 
