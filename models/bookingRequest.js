@@ -43,6 +43,10 @@ var bookingRequestSchema = new mongoose.Schema({
     end: {
         type: String,
         required: true
+    },
+    details: {
+        type: String,
+        required: false
     }
 });
 
