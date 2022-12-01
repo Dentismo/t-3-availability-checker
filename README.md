@@ -26,6 +26,8 @@ The Availability Checker component is subscribed to the topic 'request/availabil
 
 When a booking request is recieved, the JSON object will be validated to ensure we are recieving a complete request.
 A complete booking request follows the format below:
+
+```
 {
     "user": {
         "email": "JerrySmith@gmail.com",
@@ -39,10 +41,13 @@ A complete booking request follows the format below:
     "end": "11",
     "details": "Details on appointment and special needs."
 }
+```
 
 In the event of a validation error, say that the clinicId is missing, the Availability checker will publish to 'reponse/createBooking':
 
+```
 "clinicId: missing"
+```
 
 Assuming the booking request was validated, it will then be compared against the bookings in the database to see if there are conflicts for the selected timeslot. If there are no conflicts, the booking request will be published to 'request/createBooking'
 
@@ -60,16 +65,16 @@ As this is a graded university project, we will not permit any contributions fro
 Any contributions must be approved by the maintainer.
 
 ## Authors and acknowledgment
-The contributors to the Availability Checker Component include:
-Bardia Forooraghi
+-   The contributors to the Availability Checker Component include:
+    Bardia Forooraghi
     - Contributed to creating logic for checking availability of booking requests which can be seen in Controller.js
 
-John Webb
+    John Webb
     - Contributed to creating logic for checking availability of booking requests which can be seen in Controller.js
 
     - Made validation method for validating the JSON of incoming booking requests published to the 'request/createBooking' topic
 
-Georg Zsolnai
+    Georg Zsolnai
     - Added CI/CD 
 
 The other project team members consist of: Carl Dahlqvist, Ivan Vidanovic, Ansis Plepis and Daniel Dovhun. 
