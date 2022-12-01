@@ -107,6 +107,11 @@ class MqttHandler {
       } else if (typeof bookingRequest.end !== 'string') {
         errors.push('end: must be type string')
       }
+
+      if (typeof bookingRequest.details !== 'string') {
+        errors.push('details: must be type string');
+      }
+
       return errors
     }
   }
