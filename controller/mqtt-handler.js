@@ -108,7 +108,7 @@ class MqttHandler {
         errors.push('end: must be type string')
       }
 
-      if (typeof bookingRequest.details !== 'string') {
+      if (("details" in bookingRequest) && (typeof bookingRequest.details !== 'string')) {
         errors.push('details: must be type string');
       }
 
