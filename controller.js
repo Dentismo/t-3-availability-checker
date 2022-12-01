@@ -8,11 +8,14 @@ async function checkAvailability(bookingRequest) {
     const day_of_incoming_request = new Date(bookingRequest.date).getDay();
     
     if (day_of_incoming_request === 0 || day_of_incoming_request === 6)
-        return false;
+        return {accepted: false};
 
     const booking_result = await checkTimeSlot(bookingRequest, day_of_incoming_request);
 
-    return {message: booking_result}
+    if (booking_result.accepted)
+        return {accepted: true, booking: booking_result}
+    else
+        return {accepted: false};
 }
 
 async function checkTimeSlot(bookingRequest, day_of_incoming_request) {

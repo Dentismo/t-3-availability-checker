@@ -1,7 +1,7 @@
 const res = require('express/lib/response');
 const mqtt = require('mqtt');
 const checkAvailability = require('../controller');
-var Validator = require("jsonschema").Validator
+//var Validator = require("jsonschema").Validator
 
 //const availabilityController = new AvailabilityController();
 
@@ -39,7 +39,8 @@ class MqttHandler {
       if (errors.length == 0) {
         const result = await checkAvailability(JSON.parse(message.toString()));
         if (result.accepted) {
-          client.publish('request/createBooking', JSON.stringify(result))
+          message = JSON.parse(message.toString());
+          client.publish('request/createBooking', JSON.stringify(message))
         } else {
           client.publish('response/createBooking', JSON.stringify(result))
           console.log(result)
