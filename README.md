@@ -17,9 +17,7 @@ The sequence diagram represents a use case in which a user attempts to book an a
 3. Install and run Mosquitto in terminal
 4. Run ```npm i``` to download all required packages for running the app
 5. Run ```npm start dev``` to run the component
-6. Open two more terminal windows. One will be used for subscribing and the other will be used for publishing
-7. Subscribe using mosquitto_sub -t TOPIC
-8. Publish using mosquitto_pub -t TOPIC -m MESSAGE
+6. Open the Client Dentismo Website and create bookings
 
 ## Usage
 The Availability Checker component is subscribed to the topic 'request/availability'
@@ -66,15 +64,16 @@ Any contributions must be approved by the maintainer.
 
 ## Authors and acknowledgment
 -   The contributors to the Availability Checker Component include:
-    Bardia Forooraghi
+
+    **Bardia Forooraghi**
     - Contributed to creating logic for checking availability of booking requests which can be seen in Controller.js
 
-    John Webb
+    **John Webb**
     - Contributed to creating logic for checking availability of booking requests which can be seen in Controller.js
 
     - Made validation method for validating the JSON of incoming booking requests published to the 'request/createBooking' topic
 
-    Georg Zsolnai
+    **Georg Zsolnai**
     - Added CI/CD 
 
 The other project team members consist of: Carl Dahlqvist, Ivan Vidanovic, Ansis Plepis and Daniel Dovhun. 
