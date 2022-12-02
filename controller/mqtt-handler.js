@@ -43,7 +43,6 @@ class MqttHandler {
           client.publish('request/createBooking', JSON.stringify(message))
         } else {
           client.publish('response/createBooking', JSON.stringify(result))
-          console.log(result)
         }
       } else {
         client.publish('response/createBooking', errors.toString())
