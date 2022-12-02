@@ -41,10 +41,12 @@ A complete booking request follows the format below:
 }
 ```
 
-In the event of a validation error, say that the clinicId is missing, the Availability checker will publish to 'reponse/createBooking':
+In the event of a validation error, an array of error strings will be returned. For example the clinicId is missing, the Availability Checker will publish to 'reponse/createBooking':
 
 ```
+[
 "clinicId: missing"
+]
 ```
 
 Assuming the booking request was validated, it will then be compared against the bookings in the database to see if there are conflicts for the selected timeslot. If there are no conflicts, the booking request will be published to 'request/createBooking' so that the booking manager may complete the booking by saving the booking to the database.
@@ -67,7 +69,9 @@ Assuming the booking request was validated, it will then be compared against the
 Otherwise, a message is published to 'reponse/createBooking' which informs the client that the booking slot was already taken.
 
 ```
-"accepted: false"
+{
+"accepted": "false"
+}
 ```
 
 ## Support
