@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "user": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "format": "email"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "clinicID": {
+            "type": "string",
+            "minLength": 1
+        },
+        "issuance": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 13
+        },
+        "date": {
+            "type": "string"
+        },
+        "state": {
+            "type": "string",
+            "enum": ["approved", "pending", "denied"]
+        },
+        "start": {
+            "type": "string"
+        },
+        "end": {
+            "type": "string"
+        }
+    },
+    "required": ["email", "name", "clinicId", "issuance", "date", "start", "end"]
+}
