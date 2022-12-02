@@ -47,12 +47,32 @@ In the event of a validation error, say that the clinicId is missing, the Availa
 "clinicId: missing"
 ```
 
-Assuming the booking request was validated, it will then be compared against the bookings in the database to see if there are conflicts for the selected timeslot. If there are no conflicts, the booking request will be published to 'request/createBooking'
+Assuming the booking request was validated, it will then be compared against the bookings in the database to see if there are conflicts for the selected timeslot. If there are no conflicts, the booking request will be published to 'request/createBooking' so that the booking manager may complete the booking by saving the booking to the database.
 
-Otherwise, simply a boolean value of false will be published to 'reponse/createBooking' which informs the client that the booking slot was already taken.
+```{
+    "user": {
+        "email": "JerrySmith@gmail.com",
+        "name": "Jerry Smith"
+    },
+    "clinicId": "637e0e730e5ac0363e1317cc",
+    "issuance": "654321",
+    "date": "2022-12-14",
+    "state": "pending",
+    "start": "10:30",
+    "end": "11",
+    "details": "Details on appointment and special needs."
+}
+```
+
+Otherwise, a message is published to 'reponse/createBooking' which informs the client that the booking slot was already taken.
+
+```
+"accepted: false"
+```
 
 ## Support
 John Webb - muse#6181 on Discord
+
 Bardia Forooraghi - Bardia#4805 on Discord
 
 ## Roadmap
