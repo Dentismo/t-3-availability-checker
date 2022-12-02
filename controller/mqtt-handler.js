@@ -1,9 +1,6 @@
 const res = require('express/lib/response');
 const mqtt = require('mqtt');
 const checkAvailability = require('../controller');
-//var Validator = require("jsonschema").Validator
-
-//const availabilityController = new AvailabilityController();
 
 class MqttHandler {
   constructor() {
