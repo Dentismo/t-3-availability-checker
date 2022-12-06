@@ -25,24 +25,29 @@ class MqttHandler {
     // Connection callback
     this.mqttClient.on('connect', () => {
       console.log(`mqtt client connected`);
-      client.subscribe('request/availability', { qos: 1 });
+      client.subscribe('request/availability/*', { qos: 1 });
     });
 
 
     // When a message arrives, console.log it
     this.mqttClient.on('message', async function (topic, message) {
+
+      //-------------------------------------------------------------------\\
+      const id = topic.split('/')[2]  //   get id from topic
+      //--------------------------------------------------------------------\\
+
       var bookingRequest = JSON.parse(message)
       var errors = validateBookingRequest(bookingRequest)
       if (errors.length == 0) {
         const result = await checkAvailability(JSON.parse(message.toString()));
         if (result.accepted) {
           message = JSON.parse(message.toString());
-          client.publish('request/createBooking', JSON.stringify(message))
+          client.publish(`'request/create-booking/${id}'`, JSON.stringify(message))
         } else {
-          client.publish('response/createBooking', JSON.stringify(result))
+          client.publish(`'request/create-booking/${id}'`, JSON.stringify(result))
         }
       } else {
-        client.publish('response/createBooking', errors.toString())
+        client.publish(`'request/create-booking/${id}'`, errors.toString())
       }
     });
 
