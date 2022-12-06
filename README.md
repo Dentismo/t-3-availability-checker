@@ -1,92 +1,109 @@
-# Availability Checker
-
-
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://git.chalmers.se/courses/dit355/dit356-2022/t-3/availability-checker.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://git.chalmers.se/courses/dit355/dit356-2022/t-3/availability-checker/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
+# Availability Checker Component for the Dentismo Web Application 
 
 ## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+This component works in combination with other components of a distributed systems project to allow users of Dentismo, an online web application, to book appointments at dentist clinics. A user will attempt to book an appointment on the website. The request to book the appointment is then sent via an MQTT protocol from the client, through middleware and to the Availability Checker where we check the date and time against all other bookings at that specific clinic within the database. If the date and time is free, we will publish the booking request further to an MQTT topic which will then allow the subscribed Booking Manager component to complete the booking process. If the timeslot is unavailable or the booking request was somehow incomplete, we will again use the MQTT protocol to inform the client that the booking timeslot was either taken or the request had missing information. 
 
-## Badges
+## Badges - TODO
 On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
 
 ## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### Sequence Diagram
+The sequence diagram represents a use case in which a user attempts to book an appointment. The alt case shows what happens in the event a booking is accepted or denied.
+![sequenceDiagramAC.png](./sequenceDiagramAC.png)
 
 ## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+1. Clone Repository
+2. Via the terminal navigate to the cloned repository
+3. Install and run Mosquitto in terminal
+4. Run ```npm i``` to download all required packages for running the app
+5. Run ```npm start dev``` to run the component
+6. Open the Client Dentismo Website and create bookings
 
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+The Availability Checker component is subscribed to the topic 'request/availability'
+
+When a booking request is recieved, the JSON object will be validated to ensure we are recieving a complete request.
+A complete booking request follows the format below:
+
+```
+{
+    "user": {
+        "email": "JerrySmith@gmail.com",
+        "name": "Jerry Smith"
+    },
+    "clinicId": "637e0e730e5ac0363e1317cc",
+    "issuance": "654321",
+    "date": "2022-12-14",
+    "state": "pending",
+    "start": "10:30",
+    "end": "11",
+    "details": "Details on appointment and special needs."
+}
+```
+
+In the event of a validation error, an array of error strings will be returned. For example the clinicId is missing, the Availability Checker will publish to 'reponse/createBooking':
+
+```
+[
+"clinicId: missing"
+]
+```
+
+Assuming the booking request was validated, it will then be compared against the bookings in the database to see if there are conflicts for the selected timeslot. If there are no conflicts, the booking request will be published to 'request/createBooking' so that the booking manager may complete the booking by saving the booking to the database.
+
+```{
+    "user": {
+        "email": "JerrySmith@gmail.com",
+        "name": "Jerry Smith"
+    },
+    "clinicId": "637e0e730e5ac0363e1317cc",
+    "issuance": "654321",
+    "date": "2022-12-14",
+    "state": "pending",
+    "start": "10:30",
+    "end": "11",
+    "details": "Details on appointment and special needs."
+}
+```
+
+Otherwise, a message is published to 'reponse/createBooking' which informs the client that the booking slot was already taken.
+
+```
+{
+"accepted": "false"
+}
+```
 
 ## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+John Webb - muse#6181 on Discord
+
+Bardia Forooraghi - Bardia#4805 on Discord
 
 ## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+No established roadmap is in place at this time.
 
 ## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+As this is a graded university project, we will not permit any contributions from those outside of the group.
+Any contributions must be approved by the maintainer.
 
 ## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+-   The contributors to the Availability Checker Component include:
 
-## License
+    **Bardia Forooraghi**
+    - Contributed to creating logic for checking availability of booking requests which can be seen in Controller.js
+
+    **John Webb**
+    - Contributed to creating logic for checking availability of booking requests which can be seen in Controller.js
+
+    - Made validation method for validating the JSON of incoming booking requests published to the 'request/createBooking' topic
+
+    **Georg Zsolnai**
+    - Added CI/CD 
+
+The other project team members consist of: Carl Dahlqvist, Ivan Vidanovic, Ansis Plepis and Daniel Dovhun. 
+
+## License - TODO
 For open source projects, say how it is licensed.
 
 ## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+The Availability Checker is completed. Thus this repository will not recieve any additional changes for the time-being. We have completed the other components that are part of the greater Dentismo distributed system. In the next few weeks, we will be connecting the backend to the frontend, as well as establishing tests to make sure everything is performing as intended. We aim to have the greater Dentismo project completed by the 16th of December, 2022. 
