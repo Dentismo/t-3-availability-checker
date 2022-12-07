@@ -25,7 +25,7 @@ class MqttHandler {
     // Connection callback
     this.mqttClient.on('connect', () => {
       console.log(`mqtt client connected`);
-      client.subscribe('request/availability/*', { qos: 1 });
+      client.subscribe('request/availability/+', { qos: 1 });
     });
 
 
