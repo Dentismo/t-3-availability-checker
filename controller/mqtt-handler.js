@@ -25,7 +25,7 @@ class MqttHandler {
     // Connection callback
     this.mqttClient.on('connect', () => {
       console.log(`mqtt client connected`);
-      client.subscribe('request/availability/*', { qos: 1 });
+      client.subscribe('request/availability/#', { qos: 1 });
     });
 
 
@@ -42,7 +42,7 @@ class MqttHandler {
         const result = await checkAvailability(JSON.parse(message.toString()));
         client.publish(`request/create-booking/${id}`, JSON.stringify(result))
       } else {
-        client.publish(`request/create-booking/${id}`, errors.toString())
+        client.publish(`response/create-booking/${id}`, errors.toString())
       }
     });
 

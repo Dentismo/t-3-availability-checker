@@ -9,8 +9,8 @@ const history = require('connect-history-api-fallback');
 var bodyParser = require("body-parser");
 var mqttHandler = require('./controller/mqtt-handler');
 
-const mongoURI = 'mongodb://127.0.0.1:27017/dentistClinicDB';
-const port = process.env.PORT || 3000;
+const mongoURI = 'mongodb+srv://dentismoSystem:Dentismo123!@dentismocluster.jy43gwn.mongodb.net/?retryWrites=true&w=majority';
+const port = process.env.PORT || 3003;
 
 connectToDatabase(mongoURI);
 const app = startApp(port);
