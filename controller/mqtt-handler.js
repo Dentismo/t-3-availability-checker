@@ -50,13 +50,13 @@ class MqttHandler {
       const errors = [];
       const stateEnum = ['approved', 'denied', 'pending']
 
-      if (!("name" in bookingRequest.user)) {
+      if (!("name" in bookingRequest)) {
         errors.push('name: missing')
-      } else if (typeof bookingRequest.user.name !== 'string') {
+      } else if (typeof bookingRequest.name !== 'string') {
         errors.push('name: must be type string')
       }
 
-      if (!("email" in bookingRequest.user)) {
+      if (!("email" in bookingRequest)) {
         errors.push('email: missing')
       } else if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(bookingRequest.email)) {
         errors.push('email: must be a valid email')
