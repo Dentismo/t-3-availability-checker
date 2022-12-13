@@ -70,7 +70,7 @@ Otherwise, a message is published to 'reponse/create-booking' which informs the 
 
 ```
 {
-"accepted": "false"
+accepted: false
 }
 ```
 
