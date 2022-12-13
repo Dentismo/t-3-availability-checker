@@ -20,53 +20,53 @@ The sequence diagram represents a use case in which a user attempts to book an a
 6. Open the Client Dentismo Website and create bookings
 
 ## Usage
-The Availability Checker component is subscribed to the topic 'request/availability'
+The Availability Checker component is subscribed to the topic 'request/availability/+'
 
 When a booking request is recieved, the JSON object will be validated to ensure we are recieving a complete request.
 A complete booking request follows the format below:
 
 ```
 {
-    "user": {
-        "email": "JerrySmith@gmail.com",
-        "name": "Jerry Smith"
-    },
-    "clinicId": "637e0e730e5ac0363e1317cc",
-    "issuance": "654321",
-    "date": "2022-12-14",
-    "state": "pending",
-    "start": "10:30",
-    "end": "11",
-    "details": "Details on appointment and special needs."
+    email: 'JoshJ@gmail.com',
+    name: 'Josh Joshsson',
+    clinicId: '1',
+    issuance: '858954984',
+    date: '2023-01-17',
+    state: 'pending',
+    start: 'Tue Jan 17 2023 08:30:00 GMT+0100 (Central European Standard Time)',
+    end: 'Tue Jan 17 2023 09:00:00 GMT+0100 (Central European Standard Time)',
+    details: 'Booking details'
 }
 ```
 
-In the event of a validation error, an array of error strings will be returned. For example the clinicId is missing, the Availability Checker will publish to 'reponse/createBooking':
+In the event of a validation error, an array of error strings will be returned. For example, if the clinicId is missing and the email is not valid, the Availability Checker will publish to 'reponse/createBooking':
 
 ```
 [
-"clinicId: missing"
+'email: must be a valid email', 'clinicId: missing'
 ]
 ```
 
-Assuming the booking request was validated, it will then be compared against the bookings in the database to see if there are conflicts for the selected timeslot. If there are no conflicts, the booking request will be published to 'request/createBooking' so that the booking manager may complete the booking by saving the booking to the database.
+Assuming the booking request was validated, it will then be compared against the bookings in the database to see if there are conflicts for the selected timeslot. If there are no conflicts, the booking request will be published to 'request/create-booking' so that the booking manager may complete the booking by saving the booking to the database.
 
-```{
-    "user": {
-        "email": "JerrySmith@gmail.com",
-        "name": "Jerry Smith"
-    },
-    "clinicId": "637e0e730e5ac0363e1317cc",
-    "issuance": "654321",
-    "date": "2022-12-14",
-    "state": "pending",
-    "start": "10:30",
-    "end": "11",
-    "details": "Details on appointment and special needs."
+```
+{
+  accepted: true,
+  booking: {
+    email: 'JoshJ@gmail.com',
+    name: 'Josh Joshsson',
+    clinicId: '1',
+    issuance: '858954984',
+    date: '2023-01-17',
+    state: 'pending',
+    start: 'Tue Jan 17 2023 08:30:00 GMT+0100 (Central European Standard Time)',
+    end: 'Tue Jan 17 2023 09:00:00 GMT+0100 (Central European Standard Time)',
+    details: 'Booking details'
+    }
 }
 ```
 
-Otherwise, a message is published to 'reponse/createBooking' which informs the client that the booking slot was already taken.
+Otherwise, a message is published to 'reponse/create-booking' which informs the client that the booking slot was already taken.
 
 ```
 {
