@@ -4,12 +4,14 @@ const morgan = require('morgan');
 const path = require('path');
 const cors = require('cors');
 const history = require('connect-history-api-fallback');
+require("dotenv").config();
 
 
 var bodyParser = require("body-parser");
 var mqttHandler = require('./controller/mqtt-handler');
 
-const mongoURI = 'mongodb+srv://dentismoSystem:Dentismo123!@dentismocluster.jy43gwn.mongodb.net/?retryWrites=true&w=majority';
+const mongoURI =
+  process.env.MONGO_URI || "mongodb://127.0.0.1:27017/dentistClinicDB";
 const port = process.env.PORT || 3003;
 
 connectToDatabase(mongoURI);

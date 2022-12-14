@@ -24,8 +24,8 @@ class MqttHandler {
 
     // Connection callback
     this.mqttClient.on('connect', () => {
-      console.log(`mqtt client connected`);
-      client.subscribe('request/availability/+', { qos: 1 });
+      client.subscribe('request/availability/#', { qos: 1 });
+      console.log(`\n Subscribed to request/availability/#`);
     });
 
 
@@ -37,13 +37,15 @@ class MqttHandler {
       //--------------------------------------------------------------------\\
 
       var bookingRequest = JSON.parse(message)
-      var errors = validateBookingRequest(bookingRequest)
-      if (errors.length == 0) {
-        const result = await checkAvailability(JSON.parse(message.toString()));
+      //var errors = validateBookingRequest(bookingRequest)
+      const result = await checkAvailability(JSON.parse(message.toString()));
         client.publish(`request/create-booking/${id}`, JSON.stringify(result))
-      } else {
-        client.publish(`response/create-booking/${id}`, errors.toString())
-      }
+      // if (errors.length == 0) {
+      //   const result = await checkAvailability(JSON.parse(message.toString()));
+      //   client.publish(`request/create-booking/${id}`, JSON.stringify(result))
+      // } else {
+      //   client.publish(`response/create-booking/${id}`, errors.toString())
+      // }
     });
 
     function validateBookingRequest(bookingRequest) {
