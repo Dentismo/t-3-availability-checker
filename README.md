@@ -3,9 +3,6 @@
 ## Description
 This component works in combination with other components of a distributed systems project to allow users of Dentismo, an online web application, to book appointments at dentist clinics. A user will attempt to book an appointment on the website. The request to book the appointment is then sent via an MQTT protocol from the client, through middleware and to the Availability Checker where we check the date and time against all other bookings at that specific clinic within the database. If the date and time is free, we will publish the booking request further to an MQTT topic which will then allow the subscribed Booking Manager component to complete the booking process. If the timeslot is unavailable or the booking request was somehow incomplete, we will again use the MQTT protocol to inform the client that the booking timeslot was either taken or the request had missing information. 
 
-## Badges - TODO
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
 ## Visuals
 ### Sequence Diagram
 The sequence diagram represents a use case in which a user attempts to book an appointment. The alt case shows what happens in the event a booking is accepted or denied.
@@ -22,7 +19,7 @@ The sequence diagram represents a use case in which a user attempts to book an a
 ## Usage
 The Availability Checker component is subscribed to the topic 'request/availability/+'
 
-When a booking request is recieved, the JSON object will be validated to ensure we are recieving a complete request.
+When a booking request is recieved, the JSON string will be parsed into a JSON Object. It will then be validated to ensure we are recieving a complete request.
 A complete booking request follows the format below:
 
 ```
@@ -50,20 +47,20 @@ In the event of a validation error, an array of error strings will be returned. 
 Assuming the booking request was validated, it will then be compared against the bookings in the database to see if there are conflicts for the selected timeslot. If there are no conflicts, the booking request will be published to 'request/create-booking' so that the booking manager may complete the booking by saving the booking to the database.
 
 ```
-{
-  accepted: true,
-  booking: {
-    email: 'JoshJ@gmail.com',
-    name: 'Josh Joshsson',
-    clinicId: '1',
-    issuance: '858954984',
-    date: '2023-01-17',
-    state: 'pending',
-    start: 'Tue Jan 17 2023 08:30:00 GMT+0100 (Central European Standard Time)',
-    end: 'Tue Jan 17 2023 09:00:00 GMT+0100 (Central European Standard Time)',
-    details: 'Booking details'
+'{
+  "accepted": "true",
+  "booking": {
+    "email": "JoshJ@gmail.com",
+    "name": "Josh Joshsson",
+    "clinicId": "1",
+    "issuance": "858954984",
+    "date": "2023-01-17",
+    "state": "pending",
+    "start": "Tue Jan 17 2023 08:30:00 GMT+0100 (Central European Standard Time)",
+    "end": "Tue Jan 17 2023 09:00:00 GMT+0100 (Central European Standard Time)",
+    "details": "Booking details"
     }
-}
+}'
 ```
 
 Otherwise, a message is published to 'reponse/create-booking' which informs the client that the booking slot was already taken.
@@ -101,9 +98,6 @@ Any contributions must be approved by the maintainer.
     - Added CI/CD 
 
 The other project team members consist of: Carl Dahlqvist, Ivan Vidanovic, Ansis Plepis and Daniel Dovhun. 
-
-## License - TODO
-For open source projects, say how it is licensed.
 
 ## Project status
 The Availability Checker is completed. Thus this repository will not recieve any additional changes for the time-being. We have completed the other components that are part of the greater Dentismo distributed system. In the next few weeks, we will be connecting the backend to the frontend, as well as establishing tests to make sure everything is performing as intended. We aim to have the greater Dentismo project completed by the 16th of December, 2022. 
