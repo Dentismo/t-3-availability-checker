@@ -12,8 +12,8 @@ async function checkAvailability(bookingRequest) {
 
     const booking_result = await checkTimeSlot(bookingRequest, day_of_incoming_request);
 
-    if (booking_result.accepted)
-        return {accepted: true, booking: booking_result}
+    if (booking_result)
+        return {accepted: true, booking: bookingRequest}
     else
         return {accepted: false};
 }
@@ -25,9 +25,9 @@ async function checkTimeSlot(bookingRequest, day_of_incoming_request) {
     for (let i = 0; i < num_of_booking_requests; i++) {
         const current_day_of_booking_request = new Date(list[i].date).getDay();
         if ((current_day_of_booking_request === day_of_incoming_request) && (list[i].start === bookingRequest.start) && (bookingRequest.state !== 'denied'))
-            return {accepted: false};
+            return false;
     }
-    return {accepted: true, booking: bookingRequest};
+    return true;
 }
 
 
