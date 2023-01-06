@@ -42,7 +42,11 @@ class MqttHandler {
       var errors = validateBookingRequest(bookingRequest);
       console.log(errors);
       const result = await checkAvailability(JSON.parse(message.toString()));
-      client.publish(`request/create-booking/${id}`, JSON.stringify(result));
+      if(result.accepted){
+        client.publish(`request/create-booking/${id}`, JSON.stringify(result));
+      } else {
+        client.publish(`response/availability/${id}`, JSON.stringify(result))
+      }
       console.log(result);
       //   if (errors.length == 0) {
 

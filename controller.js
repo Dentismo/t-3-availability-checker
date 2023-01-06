@@ -25,7 +25,7 @@ async function checkTimeSlot(bookingRequest, day_of_incoming_request) {
 
     for (let i = 0; i < num_of_booking_requests; i++) {
         const current_day_of_booking_request = new Date(list[i].date).getDay();
-        if ((current_day_of_booking_request === day_of_incoming_request) && (list[i].start === bookingRequest.start) && (bookingRequest.state !== 'denied'))
+        if ((current_day_of_booking_request === day_of_incoming_request) && (list[i].start === bookingRequest.start))
             return false;
     }
     return true;
