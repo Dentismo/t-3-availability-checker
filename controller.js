@@ -11,6 +11,7 @@ async function checkAvailability(bookingRequest) {
         return {accepted: false};
 
     const booking_result = await checkTimeSlot(bookingRequest, day_of_incoming_request);
+    console.log(booking_result);
 
     if (booking_result)
         return {accepted: true, booking: bookingRequest}
